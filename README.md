@@ -26,3 +26,5 @@ Nostr is a lightweight Swift package for handling Nostr types on the client side
 
 # Getting Started
 More info to come soon
+
+## Alot was borrowed and inspired by [NostrKit](https://github.com/cnixbtc/NostrKit) 🙏
