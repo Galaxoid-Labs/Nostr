@@ -8,7 +8,7 @@
 
 import Foundation
 
-public enum RelayMessage: Decodable {
+public enum RelayMessage: Codable {
     
     case event(String, Event)
     case notice(String)

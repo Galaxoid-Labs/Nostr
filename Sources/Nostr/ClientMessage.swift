@@ -8,7 +8,7 @@
 
 import Foundation
 
-public enum ClientMessage: Encodable {
+public enum ClientMessage: Codable {
     
     case event(Event)
     case subscribe(Subscription)

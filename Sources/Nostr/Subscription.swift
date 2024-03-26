@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct Subscription: Encodable {
+public struct Subscription: Codable {
     
     public let id: String
     public let filters: [EventFilter]

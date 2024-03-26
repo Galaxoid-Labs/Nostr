@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct EventFilter: Encodable {
+public struct EventFilter: Codable {
     public let ids: [String]?
     public let authors: [String]?
     public let eventKinds: [EventKind]?
