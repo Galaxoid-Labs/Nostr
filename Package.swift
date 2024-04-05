@@ -1,10 +1,10 @@
-// swift-tools-version: 5.10
+// swift-tools-version: 5.8
 
 import PackageDescription
 
 let package = Package(
     name: "Nostr",
-    platforms: [.iOS(.v17), .macOS(.v14), .macCatalyst(.v17), .visionOS(.v1)],
+    platforms: [.iOS(.v16), .macOS(.v13), .macCatalyst(.v16)],
     products: [
         .library(
             name: "Nostr",
