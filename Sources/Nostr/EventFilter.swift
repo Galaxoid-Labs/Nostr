@@ -14,6 +14,7 @@ public struct EventFilter: Codable {
     public let eventKinds: [EventKind]?
     public let eventTags: [String]?
     public let pubKeyTags: [String]?
+    public let hTags: [String]?
     public let since: Timestamp?
     public let until: Timestamp?
     public let limit: Int?
@@ -23,6 +24,7 @@ public struct EventFilter: Codable {
         case authors
         case eventKinds = "kinds"
         case eventTags = "#e"
+        case hTags = "#h"
         case pubKeyTags = "#p"
         case since
         case until
@@ -35,6 +37,7 @@ public struct EventFilter: Codable {
         eventKinds: [EventKind]? = nil,
         eventTags: [String]? = nil,
         pubKeyTags: [String]? = nil,
+        hTags: [String]? = nil,
         since: Timestamp? = nil,
         until: Timestamp? =  nil,
         limit: Int? = nil
@@ -44,6 +47,7 @@ public struct EventFilter: Codable {
         self.eventKinds = eventKinds
         self.eventTags = eventTags
         self.pubKeyTags = pubKeyTags
+        self.hTags = hTags
         self.since = since
         self.until = until
         self.limit = limit
@@ -56,6 +60,7 @@ public struct EventFilter: Codable {
         try container.encodeIfPresent(eventKinds, forKey: .eventKinds)
         try container.encodeIfPresent(eventTags, forKey: .eventTags)
         try container.encodeIfPresent(pubKeyTags, forKey: .pubKeyTags)
+        try container.encodeIfPresent(hTags, forKey: .hTags)
         try container.encodeIfPresent(since, forKey: .since)
         try container.encodeIfPresent(until, forKey: .until)
         try container.encodeIfPresent(limit, forKey: .limit)
