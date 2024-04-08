@@ -25,4 +25,12 @@ public extension String {
         }
     }
     
+    func bech32FromHex(hrp: String) throws -> String {
+        do {
+            return try bech32Encode(hrp: hrp, self.bytes)
+        } catch {
+            throw error
+        }
+    }
+    
 }
