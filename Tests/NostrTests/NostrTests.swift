@@ -49,4 +49,34 @@ final class NostrTests: XCTestCase {
         XCTAssertTrue(event.isValid())
     }
     
+    func testGeneratePOWKeyPair() async throws {
+        try await KeyPair.benchMarkCore()
+        if let keyPair = try await KeyPair.newLeadingZeroBitKey(withMinimumLeadingZeroBits: 16) {
+            print(keyPair.leadingZeroBits)
+            XCTAssertNotNil(keyPair)
+            XCTAssertTrue(keyPair.leadingZeroBits >= 8)
+            print("Public Key  => " + keyPair.publicKey)
+            print("Private Key => " + keyPair.privateKey)
+            print("NPUB        => " + keyPair.bech32PublicKey)
+            print("NSEC        => " + keyPair.bech32PrivateKey)
+        } else {
+            XCTAssert(false, "")
+        }
+    }
+    
+    func testVanityPrefixKeyPair() async throws {
+        try await KeyPair.benchMarkCore()
+        let prefix = "beaf"
+        if let keyPair = try await KeyPair.newVanityKey(leadingHexPrefix: prefix) {
+            XCTAssertNotNil(keyPair)
+            XCTAssertTrue(keyPair.publicKey.hasPrefix(prefix))
+            print("Public Key  => " + keyPair.publicKey)
+            print("Private Key => " + keyPair.privateKey)
+            print("NPUB        => " + keyPair.bech32PublicKey)
+            print("NSEC        => " + keyPair.bech32PrivateKey)
+        } else {
+            XCTAssert(false, "")
+        }
+    }
+    
 }

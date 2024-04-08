@@ -15,7 +15,7 @@ Nostr is a lightweight Swift package for handling Nostr types on the client side
 - ✅ iPadOS
 - ✅ MacCatalyst
 - ✅ VisionOS
-- ❓ Linux
+- ✅ Linux
 - ❓ Windows
 
 # Todo

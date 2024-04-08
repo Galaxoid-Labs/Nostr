@@ -57,9 +57,135 @@ public struct KeyPair {
         return bech32Encode(hrp: "nsec", self._privateKey.dataRepresentation.bytes)
     }
     
+    public var publicKeyBytes: [UInt8] {
+        return self._privateKey.xonly.bytes
+    }
+    
+    public var leadingZeroBits: Int {
+        var leadingBits = 0
+        for x in self.publicKeyBytes {
+            leadingBits += x.leadingZeroBitCount
+            if x.leadingZeroBitCount != 8 {
+                break
+            }
+        }
+        return leadingBits
+    }
+    
     public enum KeyPairError: Error {
         case hexToDataFailed
         case bech32DecodeFailed
+        case vanityHexPrefixInvalid
     }
     
+    // TODO: Leading zeros and vanity generation doesnt seem to be as fast as rana.
+    // Need to look into this to see what Im doing wrong
+    
+    fileprivate static func generateLeadingZeroBitKey(withMinimumLeadingZeroBits lzb: Int = 8) async throws -> KeyPair? {
+        while true {
+            do {
+                try Task.checkCancellation()
+                let keyPair = try KeyPair()
+                var leadingBits = 0
+                for x in keyPair.publicKeyBytes {
+                    leadingBits += x.leadingZeroBitCount
+                    if leadingBits >= lzb {
+                        return keyPair
+                    }
+                    if x.leadingZeroBitCount != 8 {
+                        break
+                    }
+                }
+            } catch {
+                throw error
+            }
+        }
+    }
+    
+    public static func newLeadingZeroBitKey(withMinimumLeadingZeroBits lzb: Int = 8) async throws -> KeyPair? {
+        return try await withThrowingTaskGroup(of: KeyPair?.self, body: { group in
+            let cores = ProcessInfo().processorCount
+            print("Using \(cores) cores")
+            for _ in 0..<cores {
+                group.addTask {
+                    return try await generateLeadingZeroBitKey(withMinimumLeadingZeroBits: lzb)
+                }
+            }
+
+            do {
+                for try await result in group {
+                    if let keyPair = result {
+                        group.cancelAll()
+                        return keyPair
+                    }
+                }
+            } catch {
+                group.cancelAll()
+                throw error
+            }
+            return nil
+        })
+    }
+    
+    fileprivate static func generateVanityKey(leadingHexPrefix: String) async throws -> KeyPair? {
+        if leadingHexPrefix.isEmpty {
+            throw KeyPairError.vanityHexPrefixInvalid
+        }
+
+        for c in leadingHexPrefix {
+            if !c.isHexDigit {
+                throw KeyPairError.vanityHexPrefixInvalid
+            }
+        }
+        
+        while true {
+            do {
+                try Task.checkCancellation()
+                let keyPair = try KeyPair()
+                if keyPair.publicKey.hasPrefix(leadingHexPrefix) {
+                    return keyPair
+                }
+            } catch {
+                throw error
+            }
+        }
+    }
+    
+    public static func newVanityKey(leadingHexPrefix: String) async throws -> KeyPair? {
+        return try await withThrowingTaskGroup(of: KeyPair?.self, body: { group in
+            let cores = ProcessInfo().processorCount
+            print("Using \(cores) cores")
+            for _ in 0..<cores {
+                group.addTask {
+                    return try await generateVanityKey(leadingHexPrefix: leadingHexPrefix)
+                }
+            }
+
+            do {
+                for try await result in group {
+                    if let keyPair = result {
+                        group.cancelAll()
+                        return keyPair
+                    }
+                }
+            } catch {
+                group.cancelAll()
+                throw error
+            }
+            return nil
+        })
+    }
+    
+    public static func benchMarkCore() async throws {
+        var hashsPerSecond = 0
+        print("Benchmarking a single core for 5 seconds...")
+        let now = Date.now
+        while (now.timeIntervalSinceNow > -5) {
+            let key = try? KeyPair()
+            let _ = key?.leadingZeroBits
+            hashsPerSecond += 1
+        }
+        print("\(hashsPerSecond) hashes per second, per core")
+    }
+
 }
