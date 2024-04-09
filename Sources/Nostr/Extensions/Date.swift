@@ -8,7 +8,7 @@
 import Foundation
 
 public extension Date {
-    var toTimestamp: Timestamp {
+    var timestamp: Timestamp {
         return Timestamp(date: self)
     }
 }

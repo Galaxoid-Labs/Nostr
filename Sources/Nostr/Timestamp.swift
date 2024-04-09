@@ -34,3 +34,9 @@ public struct Timestamp: Codable {
         try container.encode(timestamp)
     }
 }
+
+public extension Timestamp {
+    var date: Date {
+        return Date(timeIntervalSince1970: TimeInterval(timestamp))
+    }
+}
