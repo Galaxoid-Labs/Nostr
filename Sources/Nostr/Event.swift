@@ -14,7 +14,7 @@ public struct Event: Codable {
     public var pubkey: String // 32-byte lowercase hex-encoded public key of the event creator
     public var createdAt: Timestamp // Unix timestamp in seconds
     public var kind: EventKind // Integer between 0 and 65535
-    public var tags: [EventTag] // Array of arrays of strings for tags
+    public var tags: [Tag] // Array of arrays of strings for tags
     public var content: String // Arbitrary string content
     public var sig: String? // 64-byte lowercase hex of the signature
     
@@ -28,7 +28,7 @@ struct SerializableEvent: Encodable {
     let publicKey: String
     let createdAt: Timestamp
     let kind: EventKind
-    let tags: [EventTag]
+    let tags: [Tag]
     let content: String
     
     static var encoder: JSONEncoder {

@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct EventTag: Codable {
+public struct Tag: Codable {
     private let underlyingData: [String]
     
     public var id: String {
@@ -19,12 +19,12 @@ public struct EventTag: Codable {
         return Array(underlyingData.suffix(from: 1))
     }
     
-    public static func event(otherEventId: String, recommendedRelay: URL? = nil) -> EventTag {
-        return EventTag(id: "e", otherInformation: otherEventId, recommendedRelay?.absoluteString)
+    public static func event(otherEventId: String, recommendedRelay: URL? = nil) -> Tag {
+        return Tag(id: "e", otherInformation: otherEventId, recommendedRelay?.absoluteString)
     }
     
-    public static func pubKey(publicKey: String, recommendedRelay: URL? = nil) -> EventTag {
-        return EventTag(id: "p", otherInformation: publicKey, recommendedRelay?.absoluteString)
+    public static func pubKey(publicKey: String, recommendedRelay: URL? = nil) -> Tag {
+        return Tag(id: "p", otherInformation: publicKey, recommendedRelay?.absoluteString)
     }
     
     public init(underlyingData: [String]) {
