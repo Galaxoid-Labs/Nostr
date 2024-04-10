@@ -66,7 +66,7 @@ final class NostrTests: XCTestCase {
     
     func testVanityPrefixKeyPair() async throws {
         try await KeyPair.benchMarkCore()
-        let prefix = "beaf"
+        let prefix = "be"
         if let keyPair = try await KeyPair.newVanityKey(leadingHexPrefix: prefix) {
             XCTAssertNotNil(keyPair)
             XCTAssertTrue(keyPair.publicKey.hasPrefix(prefix))
