@@ -54,7 +54,7 @@ public struct EventFilter: Codable {
         self.eTags = eTags
         self.pTags = pTags
         self.hTags = hTags
-        self.dTags = pTags
+        self.dTags = dTags
         self.aTags = hTags
         self.since = since
         self.until = until
