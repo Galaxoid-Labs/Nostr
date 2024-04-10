@@ -11,6 +11,9 @@ import Foundation
 public enum RelayMessage: Codable {
     
     case event(String, Event)
+    case ok(String, Bool, String)
+    case eose(String)
+    case closed(String, String)
     case notice(String)
     case other([String])
     
@@ -26,6 +29,17 @@ public enum RelayMessage: Codable {
             let subscriptionId = try container.decode(String.self)
             let event = try container.decode(Event.self)
             self = .event(subscriptionId, event)
+        case "OK":
+            let subscriptionId = try container.decode(String.self)
+            let acceptance = try container.decode(Bool.self)
+            let message = try container.decode(String.self)
+            self = .ok(subscriptionId, acceptance, message)
+        case "EOSE":
+            self = .eose(try container.decode(String.self))
+        case "CLOSED":
+            let subscriptionId = try container.decode(String.self)
+            let message = try container.decode(String.self)
+            self = .closed(subscriptionId, message)
         case "NOTICE":
             self = .notice(try container.decode(String.self))
         default:
