@@ -15,6 +15,7 @@ public enum RelayMessage: Codable {
     case eose(String)
     case closed(String, String)
     case notice(String)
+    case auth(String)
     case other([String])
     
     static var decoder = JSONDecoder()
@@ -42,6 +43,8 @@ public enum RelayMessage: Codable {
             self = .closed(subscriptionId, message)
         case "NOTICE":
             self = .notice(try container.decode(String.self))
+        case "AUTH":
+            self = .auth(try container.decode(String.self))
         default:
             let remainingItemsCount = (container.count ?? 1) - 1
             let remainingItems = try (0..<remainingItemsCount).map { _ in try container.decode(String.self) }
