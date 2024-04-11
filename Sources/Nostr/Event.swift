@@ -21,6 +21,16 @@ public struct Event: Codable {
     enum CodingKeys: String, CodingKey {
         case id, pubkey, createdAt = "created_at", kind, tags, content, sig
     }
+    
+    public init(id: String? = nil, pubkey: String, createdAt: Timestamp, kind: EventKind, tags: [Tag], content: String, sig: String? = nil) {
+        self.id = id
+        self.pubkey = pubkey
+        self.createdAt = createdAt
+        self.kind = kind
+        self.tags = tags
+        self.content = content
+        self.sig = sig
+    }
 }
 
 struct SerializableEvent: Encodable {
