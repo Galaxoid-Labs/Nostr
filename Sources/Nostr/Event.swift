@@ -88,6 +88,7 @@ extension Event {
         do {
             let serializableEventData = try serializableEventData()
             let idData = Data(SHA256.hash(data: serializableEventData))
+            if id != idData.hex() { return false }
             let idBytes = idData.bytes
             guard let sigBytes = Data(hexString: sig)?.bytes else { return false }
             guard let pubkeyBytes = Data(hexString: self.pubkey)?.bytes else { return false }
