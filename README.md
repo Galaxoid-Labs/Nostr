@@ -12,13 +12,15 @@ Looking for something more high-level that also handles socket connections? Chec
 - [secp256k1.swift v0.16.0](https://github.com/GigaBitcoin/secp256k1.swift)
 
 # Platforms
-- ✅ MacOS
-- ✅ iOS
-- ✅ iPadOS
-- ✅ MacCatalyst
-- ✅ VisionOS
+- ✅ MacOS 14+
+- ✅ iOS 17+
+- ✅ iPadOS 17+
+- ✅ MacCatalyst 17+
+- ✅ VisionOS 1+
+- ✅ tvOS 17+ 
+- ✅ watchOS 10+
 - ✅ Linux
-- ❓ Windows
+- ✅ Windows
 
 # Todo
 - Documentation

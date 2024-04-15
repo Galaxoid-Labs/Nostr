@@ -4,7 +4,7 @@ import PackageDescription
 
 let package = Package(
     name: "Nostr",
-    platforms: [.iOS(.v16), .macOS(.v13), .macCatalyst(.v16), .visionOS(.v1)],
+    platforms: [.iOS(.v17), .macOS(.v14), .macCatalyst(.v17), .visionOS(.v1), .tvOS(.v17), .watchOS(.v10)],
     products: [
         .library(
             name: "Nostr",
