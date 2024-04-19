@@ -1,5 +1,5 @@
 import XCTest
-@testable import Nostr
+import Nostr
 import secp256k1
 
 final class NostrTests: XCTestCase {
@@ -35,6 +35,18 @@ final class NostrTests: XCTestCase {
         XCTAssertTrue(event.hasValidId())
     }
     
+    // Signature verification
+    func testEventIsValid() throws {
+        let eventJson =
+"""
+{\"id\":\"f603166e0fdb6a0329e3998280ecad0e54d89f5f8bc20d1f259a41983aca9dfb\",\"pubkey\":\"3bf0c63fcb93463407af97a5e5ee64fa883d107ef9e558472c4eb9aaaefa459d\",\"created_at\":1711372078,\"kind\":1,\"tags\":[[\"client\",\"gossip\"],[\"p\",\"fd5989ddfadd9e2af6ceb8b63942a9e31b37367e89917931ede3b2ea76823f10\"],[\"e\",\"7eb018629bcea71512ac83a8b5dab73fa0484c395eafeff797ace4ec463fee7f\",\"wss://nostr.wine/\",\"root\"],[\"e\",\"ab1f4ebf1f75c7bdff65e95bbd068775b5623fedf9be1b0903cbc0b47e1d1c4d\",\"wss://nostr.mom/\",\"reply\"]],\"content\":\"Damn, this is frightening.\\n\\nWhy are early 2000s articles flagged as AI?\",\"sig\":\"09c197c5159eeac3213fdadec5245501df617a23a5f9b581db22ee822a10f98509302a50335166bd24f672ec19c945e0048bedf25497e53161b80b9e67a1d941\"}
+"""
+        guard let data = eventJson.data(using: .utf8) else { return XCTAssert(false, "Unable to encode json string to data") }
+        let decoder = JSONDecoder()
+        let event = try! decoder.decode(Event.self, from: data)
+        XCTAssertTrue(event.isValid())
+    }
+    
     func testCreateAndSignEventThatIsValid() throws {
         let keyPair = try KeyPair(bech32PrivateKey: "nsec1r7uh0ryrf0n7z3l4qumzevw9q2s57us4wzqrendpavtjn7uvy5rs9szssa")
         XCTAssertNotNil(keyPair)
@@ -54,7 +66,7 @@ final class NostrTests: XCTestCase {
         if let keyPair = try await KeyPair.newLeadingZeroBitKey(withMinimumLeadingZeroBits: 16) {
             print(keyPair.leadingZeroBits)
             XCTAssertNotNil(keyPair)
-            XCTAssertTrue(keyPair.leadingZeroBits >= 8)
+            XCTAssertTrue(keyPair.leadingZeroBits >= 16)
             print("Public Key  => " + keyPair.publicKey)
             print("Private Key => " + keyPair.privateKey)
             print("NPUB        => " + keyPair.bech32PublicKey)
@@ -64,12 +76,57 @@ final class NostrTests: XCTestCase {
         }
     }
     
-    func testVanityPrefixKeyPair() async throws {
+    func testVanityHexPrefixKeyPair() async throws {
         try await KeyPair.benchMarkCore()
-        let prefix = "be"
-        if let keyPair = try await KeyPair.newVanityKey(leadingHexPrefix: prefix) {
+        let prefix = "dead"
+        if let keyPair = try await KeyPair.newVanityHexKey(leadingHexPrefix: prefix) {
             XCTAssertNotNil(keyPair)
             XCTAssertTrue(keyPair.publicKey.hasPrefix(prefix))
+            print("Public Key  => " + keyPair.publicKey)
+            print("Private Key => " + keyPair.privateKey)
+            print("NPUB        => " + keyPair.bech32PublicKey)
+            print("NSEC        => " + keyPair.bech32PrivateKey)
+        } else {
+            XCTAssert(false, "")
+        }
+    }
+    
+    func testVanityHexSuffixKeyPair() async throws {
+        try await KeyPair.benchMarkCore()
+        let suffix = "dead"
+        if let keyPair = try await KeyPair.newVanityHexKey(trailingHexSuffix: suffix) {
+            XCTAssertNotNil(keyPair)
+            XCTAssertTrue(keyPair.publicKey.hasSuffix(suffix))
+            print("Public Key  => " + keyPair.publicKey)
+            print("Private Key => " + keyPair.privateKey)
+            print("NPUB        => " + keyPair.bech32PublicKey)
+            print("NSEC        => " + keyPair.bech32PrivateKey)
+        } else {
+            XCTAssert(false, "")
+        }
+    }
+    
+    func testVanityBec32PrefixKeyPair() async throws {
+        try await KeyPair.benchMarkCoreWithBech32()
+        let prefix = "dead"
+        if let keyPair = try await KeyPair.newVanityBech32Key(leadingBech32Prefix: prefix) {
+            XCTAssertNotNil(keyPair)
+            XCTAssertTrue(keyPair.bech32PublicKey.hasPrefix("npub1"+prefix))
+            print("Public Key  => " + keyPair.publicKey)
+            print("Private Key => " + keyPair.privateKey)
+            print("NPUB        => " + keyPair.bech32PublicKey)
+            print("NSEC        => " + keyPair.bech32PrivateKey)
+        } else {
+            XCTAssert(false, "")
+        }
+    }
+    
+    func testVanityBec32SuffixKeyPair() async throws {
+        try await KeyPair.benchMarkCoreWithBech32()
+        let suffix = "dead"
+        if let keyPair = try await KeyPair.newVanityBech32Key(trailingBech32Suffix: suffix) {
+            XCTAssertNotNil(keyPair)
+            XCTAssertTrue(keyPair.bech32PublicKey.hasSuffix(suffix))
             print("Public Key  => " + keyPair.publicKey)
             print("Private Key => " + keyPair.privateKey)
             print("NPUB        => " + keyPair.bech32PublicKey)

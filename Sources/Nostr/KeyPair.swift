@@ -76,10 +76,10 @@ public struct KeyPair {
         case hexToDataFailed
         case bech32DecodeFailed
         case vanityHexPrefixInvalid
+        case vanityHexSuffixInvalid
+        case vanityBech32PrefixInvalid
+        case vanityBech32SuffixInvalid
     }
-    
-    // TODO: Leading zeros and vanity generation doesnt seem to be as fast as rana.
-    // Need to look into this to see what Im doing wrong
     
     fileprivate static func generateLeadingZeroBitKey(withMinimumLeadingZeroBits lzb: Int = 8) async throws -> KeyPair? {
         while true {
@@ -95,6 +95,62 @@ public struct KeyPair {
                     if x.leadingZeroBitCount != 8 {
                         break
                     }
+                }
+            } catch {
+                throw error
+            }
+        }
+    }
+    
+    fileprivate static func generateVanityHexKey(leadingHexPrefix: String) async throws -> KeyPair? {
+        while true {
+            do {
+                try Task.checkCancellation()
+                let keyPair = try KeyPair()
+                if keyPair.publicKey.hasPrefix(leadingHexPrefix) {
+                    return keyPair
+                }
+            } catch {
+                throw error
+            }
+        }
+    }
+    
+    fileprivate static func generateVanityHexKey(trailingHexSuffix: String) async throws -> KeyPair? {
+        while true {
+            do {
+                try Task.checkCancellation()
+                let keyPair = try KeyPair()
+                if keyPair.publicKey.hasSuffix(trailingHexSuffix) {
+                    return keyPair
+                }
+            } catch {
+                throw error
+            }
+        }
+    }
+   
+    fileprivate static func generateVanityBech32Key(leadingBech32Prefix: String) async throws -> KeyPair? {
+        while true {
+            do {
+                try Task.checkCancellation()
+                let keyPair = try KeyPair()
+                if keyPair.bech32PublicKey.hasPrefix("npub1"+leadingBech32Prefix) {
+                    return keyPair
+                }
+            } catch {
+                throw error
+            }
+        }
+    }
+    
+    fileprivate static func generateVanityBech32Key(trailingBech32Suffix: String) async throws -> KeyPair? {
+        while true {
+            do {
+                try Task.checkCancellation()
+                let keyPair = try KeyPair()
+                if keyPair.bech32PublicKey.hasSuffix(trailingBech32Suffix) {
+                    return keyPair
                 }
             } catch {
                 throw error
@@ -127,7 +183,8 @@ public struct KeyPair {
         })
     }
     
-    fileprivate static func generateVanityKey(leadingHexPrefix: String) async throws -> KeyPair? {
+    public static func newVanityHexKey(leadingHexPrefix: String) async throws -> KeyPair? {
+        
         if leadingHexPrefix.isEmpty {
             throw KeyPairError.vanityHexPrefixInvalid
         }
@@ -138,26 +195,116 @@ public struct KeyPair {
             }
         }
         
-        while true {
-            do {
-                try Task.checkCancellation()
-                let keyPair = try KeyPair()
-                if keyPair.publicKey.hasPrefix(leadingHexPrefix) {
-                    return keyPair
-                }
-            } catch {
-                throw error
-            }
-        }
-    }
-    
-    public static func newVanityKey(leadingHexPrefix: String) async throws -> KeyPair? {
         return try await withThrowingTaskGroup(of: KeyPair?.self, body: { group in
             let cores = ProcessInfo().processorCount
             print("Using \(cores) cores")
             for _ in 0..<cores {
                 group.addTask {
-                    return try await generateVanityKey(leadingHexPrefix: leadingHexPrefix)
+                    return try await generateVanityHexKey(leadingHexPrefix: leadingHexPrefix)
+                }
+            }
+
+            do {
+                for try await result in group {
+                    if let keyPair = result {
+                        group.cancelAll()
+                        return keyPair
+                    }
+                }
+            } catch {
+                group.cancelAll()
+                throw error
+            }
+            return nil
+        })
+    }
+    
+    public static func newVanityHexKey(trailingHexSuffix: String) async throws -> KeyPair? {
+        
+        if trailingHexSuffix.isEmpty {
+            throw KeyPairError.vanityHexSuffixInvalid
+        }
+
+        for c in trailingHexSuffix {
+            if !c.isHexDigit {
+                throw KeyPairError.vanityHexSuffixInvalid
+            }
+        }
+        
+        return try await withThrowingTaskGroup(of: KeyPair?.self, body: { group in
+            let cores = ProcessInfo().processorCount
+            print("Using \(cores) cores")
+            for _ in 0..<cores {
+                group.addTask {
+                    return try await generateVanityHexKey(trailingHexSuffix: trailingHexSuffix)
+                }
+            }
+
+            do {
+                for try await result in group {
+                    if let keyPair = result {
+                        group.cancelAll()
+                        return keyPair
+                    }
+                }
+            } catch {
+                group.cancelAll()
+                throw error
+            }
+            return nil
+        })
+    }
+    
+    public static func newVanityBech32Key(leadingBech32Prefix: String) async throws -> KeyPair? {
+        
+        if leadingBech32Prefix.isEmpty {
+            throw KeyPairError.vanityBech32PrefixInvalid
+        }
+        
+        if !bech32Set.isSuperset(of: leadingBech32Prefix) {
+            throw KeyPairError.vanityBech32PrefixInvalid
+        }
+        
+        return try await withThrowingTaskGroup(of: KeyPair?.self, body: { group in
+            let cores = ProcessInfo().processorCount
+            print("Using \(cores) cores")
+            for _ in 0..<cores {
+                group.addTask {
+                    return try await generateVanityBech32Key(leadingBech32Prefix: leadingBech32Prefix)
+                }
+            }
+
+            do {
+                for try await result in group {
+                    if let keyPair = result {
+                        group.cancelAll()
+                        return keyPair
+                    }
+                }
+            } catch {
+                group.cancelAll()
+                throw error
+            }
+            return nil
+        })
+    }
+    
+    public static func newVanityBech32Key(trailingBech32Suffix: String) async throws -> KeyPair? {
+        
+        if trailingBech32Suffix.isEmpty {
+            throw KeyPairError.vanityBech32SuffixInvalid
+        }
+        
+        if !bech32Set.isSuperset(of: trailingBech32Suffix) {
+            throw KeyPairError.vanityBech32SuffixInvalid
+        }
+        
+        return try await withThrowingTaskGroup(of: KeyPair?.self, body: { group in
+            let cores = ProcessInfo().processorCount
+            print("Using \(cores) cores")
+            for _ in 0..<cores {
+                group.addTask {
+                    return try await generateVanityBech32Key(trailingBech32Suffix: trailingBech32Suffix)
                 }
             }
 
@@ -183,6 +330,18 @@ public struct KeyPair {
         while (now.timeIntervalSinceNow > -5) {
             let key = try? KeyPair()
             let _ = key?.leadingZeroBits
+            hashsPerSecond += 1
+        }
+        print("\(hashsPerSecond) hashes per second, per core")
+    }
+    
+    public static func benchMarkCoreWithBech32() async throws {
+        var hashsPerSecond = 0
+        print("Benchmarking a single core for 5 seconds...")
+        let now = Date.now
+        while (now.timeIntervalSinceNow > -5) {
+            let key = try? KeyPair()
+            let _ = key?.bech32PublicKey
             hashsPerSecond += 1
         }
         print("\(hashsPerSecond) hashes per second, per core")

@@ -11,6 +11,7 @@
 //  Inspired by Pieter Wuille C++ implementation
 import Foundation
 
+public let bech32Set = Set("023456789acdefghjklmnpqrstuvwxyz")
 /// Bech32 checksum implementation
 fileprivate let gen: [UInt32] = [0x3b6a57b2, 0x26508e6d, 0x1ea119fa, 0x3d4233dd, 0x2a1462b3]
 /// Bech32 checksum delimiter
