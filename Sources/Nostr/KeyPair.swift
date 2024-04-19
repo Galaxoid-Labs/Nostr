@@ -130,12 +130,13 @@ public struct KeyPair {
         }
     }
    
+    // Should include npub1 with prefix
     fileprivate static func generateVanityBech32Key(leadingBech32Prefix: String) async throws -> KeyPair? {
         while true {
             do {
                 try Task.checkCancellation()
                 let keyPair = try KeyPair()
-                if keyPair.bech32PublicKey.hasPrefix("npub1"+leadingBech32Prefix) {
+                if keyPair.bech32PublicKey.hasPrefix(leadingBech32Prefix) {
                     return keyPair
                 }
             } catch {
@@ -265,12 +266,14 @@ public struct KeyPair {
             throw KeyPairError.vanityBech32PrefixInvalid
         }
         
+        let prefixWithNpub = "npub1"+leadingBech32Prefix
+        
         return try await withThrowingTaskGroup(of: KeyPair?.self, body: { group in
             let cores = ProcessInfo().processorCount
             print("Using \(cores) cores")
             for _ in 0..<cores {
                 group.addTask {
-                    return try await generateVanityBech32Key(leadingBech32Prefix: leadingBech32Prefix)
+                    return try await generateVanityBech32Key(leadingBech32Prefix: prefixWithNpub)
                 }
             }
 
