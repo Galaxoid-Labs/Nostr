@@ -59,6 +59,19 @@ struct SerializableEvent: Encodable {
 }
 
 extension Event {
+    
+    public func bech32EncodeEventId() -> String? {
+        guard let id else { return nil }
+        return try? id.bech32FromHex(hrp: "note")
+    }
+    
+    public static func bech32EncodeEventId(_ id: String) -> String? {
+        return try? id.bech32FromHex(hrp: "note")
+    }
+    
+    public static func bech32DecodeEventId(_ id: String) -> String? {
+        return try? id.hexFromBech32(hrp: "note")
+    }
 
     func serializableEventData() throws -> Data {
         let serializableEvent = SerializableEvent(

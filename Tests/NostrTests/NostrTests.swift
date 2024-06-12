@@ -106,7 +106,7 @@ final class NostrTests: XCTestCase {
         }
     }
     
-    func testVanityBec32PrefixKeyPair() async throws {
+    func testVanityBech32PrefixKeyPair() async throws {
         try await KeyPair.benchMarkCoreWithBech32()
         let prefix = "dead"
         if let keyPair = try await KeyPair.newVanityBech32Key(leadingBech32Prefix: prefix) {
@@ -121,7 +121,7 @@ final class NostrTests: XCTestCase {
         }
     }
     
-    func testVanityBec32SuffixKeyPair() async throws {
+    func testVanityBech32SuffixKeyPair() async throws {
         try await KeyPair.benchMarkCoreWithBech32()
         let suffix = "dead"
         if let keyPair = try await KeyPair.newVanityBech32Key(trailingBech32Suffix: suffix) {
@@ -131,6 +131,24 @@ final class NostrTests: XCTestCase {
             print("Private Key => " + keyPair.privateKey)
             print("NPUB        => " + keyPair.bech32PublicKey)
             print("NSEC        => " + keyPair.bech32PrivateKey)
+        } else {
+            XCTAssert(false, "")
+        }
+    }
+    
+    func testBech32EncodeEventId() async {
+        let id = "f603166e0fdb6a0329e3998280ecad0e54d89f5f8bc20d1f259a41983aca9dfb"
+        if let encoded = Event.bech32EncodeEventId(id) {
+            XCTAssertEqual(encoded, "note17cp3vms0md4qx20rnxpgpm9dpe2d386l30pq68e9nfqeswk2nhasgvrk8y")
+        } else {
+            XCTAssert(false, "")
+        }
+    }
+    
+    func testBech32DecodeEventId() async {
+        let id = "note17cp3vms0md4qx20rnxpgpm9dpe2d386l30pq68e9nfqeswk2nhasgvrk8y"
+        if let decoded = Event.bech32DecodeEventId(id) {
+            XCTAssertEqual(decoded, "f603166e0fdb6a0329e3998280ecad0e54d89f5f8bc20d1f259a41983aca9dfb")
         } else {
             XCTAssert(false, "")
         }
