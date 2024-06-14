@@ -60,6 +60,17 @@ struct SerializableEvent: Encodable {
 
 extension Event {
     
+    public func debugPrint() -> String {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.prettyPrinted]
+        if let data = try? encoder.encode(self) {
+            if let jsonString = String(data: data, encoding: .utf8) {
+                return jsonString
+            }
+        }
+        return ""
+    }
+    
     public func bech32EncodeEventId() -> String? {
         guard let id else { return nil }
         return try? id.bech32FromHex(hrp: "note")
