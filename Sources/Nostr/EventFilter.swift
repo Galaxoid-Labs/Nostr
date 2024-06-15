@@ -16,7 +16,7 @@ public struct EventFilter: Codable {
     public let until: Timestamp?
     public let limit: Int?
 
-    private let tags: [String: [Tag]]
+    private let tags: [Tag]
     
     public init(
         ids: [String]? = nil,
@@ -33,7 +33,7 @@ public struct EventFilter: Codable {
         self.since = since
         self.until = until
         self.limit = limit
-        self.tags = Dictionary(grouping: tags, by: { $0.id })
+        self.tags = tags
     }
     
     public func encode(to encoder: Encoder) throws {
@@ -45,8 +45,9 @@ public struct EventFilter: Codable {
         try container.encodeIfPresent(until, forKey: CustomCodingKeys(stringValue: "until"))
         try container.encodeIfPresent(limit, forKey: CustomCodingKeys(stringValue: "limit"))
         
-        for (k, t) in tags {
-            try container.encode(t, forKey: CustomCodingKeys(stringValue: "#\(k.trimmingPrefix("#"))")) // We trim # just in case user passed it in, we add it ourselves
+        for tag in tags {
+            let key = tag.id.trimmingPrefix("#")
+            try container.encode(tag.otherInformation, forKey: CustomCodingKeys(stringValue: "#\(key)")) // We trim # just in case user passed it in, we add it ourselves
         }
     }
     
