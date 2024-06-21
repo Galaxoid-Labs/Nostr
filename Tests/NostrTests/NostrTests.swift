@@ -213,7 +213,7 @@ final class NostrTests: XCTestCase {
     func testEncodeNAddr() async {
         let author = "3bf0c63fcb93463407af97a5e5ee64fa883d107ef9e558472c4eb9aaaefa459d"
         let relays = ["wss://relay.nostr.example.mydomain.example.com", "wss://nostr.banana.com"]
-        let kind = 30023
+        let kind: UInt32 = 30023
         let identifier = "banana"
         if let encoded = try? encodeNAddr(publicKey: author, relays: relays, identifier: identifier, kind: kind) {
             XCTAssertEqual(encoded, "naddr1qqrxyctwv9hxzqfwwaehxw309aex2mrp0yhxummnw3ezuetcv9khqmr99ekhjer0d4skjm3wv4uxzmtsd3jjucm0d5q3vamnwvaz7tmwdaehgu3wvfskuctwvyhxxmmdqgsrhuxx8l9ex335q7he0f09aej04zpazpl0ne2cgukyawd24mayt8grqsqqqa28a3lkds")

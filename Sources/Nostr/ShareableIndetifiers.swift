@@ -10,10 +10,10 @@
 import Foundation
 
 public struct TLV {
-    static let TLVDefault: UInt8 = 0
-    static let TLVRelay: UInt8 = 1
-    static let TLVAuthor: UInt8 = 2
-    static let TLVKind: UInt8 = 3
+    static let Default: UInt8 = 0
+    static let Relay: UInt8 = 1
+    static let Author: UInt8 = 2
+    static let Kind: UInt8 = 3
 }
 
 public let nProfilePrefix = "nprofile"
@@ -35,7 +35,7 @@ public struct EventPointer: Codable {
     public var id: String
     public var relays: [String]
     public var author: String?
-    public var kind: Int?
+    public var kind: UInt32?
     
     public enum CodingKeys: String, CodingKey {
         case id
@@ -48,7 +48,7 @@ public struct EventPointer: Codable {
 public struct EntityPointer: Codable {
     public var publicKey: String
     public var relays: [String]
-    public var kind: Int?
+    public var kind: UInt32?
     public var identifier: String?
     
     public enum CodingKeys: String, CodingKey {
@@ -86,21 +86,21 @@ public func encodeNote(withId id: String) throws -> String {
     return try id.bech32FromHex(hrp: notePrefix)
 }
 
-public func encodeNEvent(withId id: String, author: String?, relays: [String] = [], kind: Int? = nil) throws -> String {
+public func encodeNEvent(withId id: String, author: String?, relays: [String] = [], kind: UInt32? = nil) throws -> String {
     guard let id = Data(hexString: id), id.count == 32 else { throw ShareableIndentifierError.invalidEventId }
     var buffer = Data()
 
-    writeTLVEntry(buffer: &buffer, type: TLV.TLVDefault, value: [UInt8](id))
+    writeTLVEntry(buffer: &buffer, type: TLV.Default, value: [UInt8](id))
     
     for relay in relays {
         if let relayData = relay.data(using: .utf8) {
-            writeTLVEntry(buffer: &buffer, type: TLV.TLVRelay, value: [UInt8](relayData))
+            writeTLVEntry(buffer: &buffer, type: TLV.Relay, value: [UInt8](relayData))
         }
     }
    
     if let author {
         guard let pubkey = Data(hexString: author), pubkey.count == 32 else { throw ShareableIndentifierError.publicKeyInvalid }
-        writeTLVEntry(buffer: &buffer, type: TLV.TLVAuthor, value: [UInt8](pubkey))
+        writeTLVEntry(buffer: &buffer, type: TLV.Author, value: [UInt8](pubkey))
     }
     
     if let kind {
@@ -108,7 +108,7 @@ public func encodeNEvent(withId id: String, author: String?, relays: [String] = 
         kindBytes.withUnsafeMutableBytes { (ptr: UnsafeMutableRawBufferPointer) in
             ptr.storeBytes(of: UInt32(kind).bigEndian, as: UInt32.self)
         }
-        writeTLVEntry(buffer: &buffer, type: TLV.TLVKind, value: kindBytes)
+        writeTLVEntry(buffer: &buffer, type: TLV.Kind, value: kindBytes)
     }
     
     return bech32Encode(hrp: nEventPrefix, buffer.bytes)
@@ -116,40 +116,42 @@ public func encodeNEvent(withId id: String, author: String?, relays: [String] = 
 
 public func encodeNProfile(publicKey: String, relays: [String] = []) throws -> String {
     guard let pubkey = Data(hexString: publicKey), pubkey.count == 32 else { throw ShareableIndentifierError.publicKeyInvalid }
+    
     var buffer = Data()
     
-    writeTLVEntry(buffer: &buffer, type: TLV.TLVDefault, value: [UInt8](pubkey))
+    writeTLVEntry(buffer: &buffer, type: TLV.Default, value: [UInt8](pubkey))
     
     for relay in relays {
         if let relayData = relay.data(using: .utf8) {
-            writeTLVEntry(buffer: &buffer, type: TLV.TLVRelay, value: [UInt8](relayData))
+            writeTLVEntry(buffer: &buffer, type: TLV.Relay, value: [UInt8](relayData))
         }
     }
     
     return bech32Encode(hrp: nProfilePrefix, buffer.bytes)
 }
 
-public func encodeNAddr(publicKey: String, relays: [String] = [], identifier: String, kind: Int) throws -> String {
+public func encodeNAddr(publicKey: String, relays: [String] = [], identifier: String, kind: UInt32) throws -> String {
     guard let pubkey = Data(hexString: publicKey), pubkey.count == 32 else { throw ShareableIndentifierError.publicKeyInvalid }
+    
     var buffer = Data()
     
     if let identifierData = identifier.data(using: .utf8) {
-        writeTLVEntry(buffer: &buffer, type: TLV.TLVDefault, value: [UInt8](identifierData))
+        writeTLVEntry(buffer: &buffer, type: TLV.Default, value: [UInt8](identifierData))
     }
     
     for relay in relays {
         if let relayData = relay.data(using: .utf8) {
-            writeTLVEntry(buffer: &buffer, type: TLV.TLVRelay, value: [UInt8](relayData))
+            writeTLVEntry(buffer: &buffer, type: TLV.Relay, value: [UInt8](relayData))
         }
     }
     
-    writeTLVEntry(buffer: &buffer, type: TLV.TLVAuthor, value: [UInt8](pubkey))
+    writeTLVEntry(buffer: &buffer, type: TLV.Author, value: [UInt8](pubkey))
     
     var kindBytes = [UInt8](repeating: 0, count: 4)
     kindBytes.withUnsafeMutableBytes { (ptr: UnsafeMutableRawBufferPointer) in
         ptr.storeBytes(of: UInt32(kind).bigEndian, as: UInt32.self)
     }
-    writeTLVEntry(buffer: &buffer, type: TLV.TLVKind, value: kindBytes)
+    writeTLVEntry(buffer: &buffer, type: TLV.Kind, value: kindBytes)
     
     return bech32Encode(hrp: nAddrPrefix, buffer.bytes)
 }
@@ -180,12 +182,12 @@ public func decodeNProfile(_ string: String) throws -> ProfilePointer? {
         }
         
         switch t {
-            case TLV.TLVDefault:
+            case TLV.Default:
                 if v.count < 32 {
                     throw ShareableIndentifierError.publicKeyInvalid
                 }
                 result.publicKey = v.map { String(format: "%02x", $0) }.joined()
-            case TLV.TLVRelay:
+            case TLV.Relay:
                 result.relays.append(String(decoding: v, as: UTF8.self))
             default:
                 break
@@ -223,20 +225,20 @@ public func decodeNEvent(_ string: String) throws -> EventPointer? {
         }
         
         switch t {
-            case TLV.TLVDefault:
+            case TLV.Default:
                 if v.count < 32 {
                     throw ShareableIndentifierError.publicKeyInvalid
                 }
                 result.id = v.map { String(format: "%02x", $0) }.joined()
-            case TLV.TLVRelay:
+            case TLV.Relay:
                 result.relays.append(String(decoding: v, as: UTF8.self))
-            case TLV.TLVAuthor:
+            case TLV.Author:
                 if v.count < 32 {
                     throw ShareableIndentifierError.publicKeyInvalid
                 }
                 result.author = v.map { String(format: "%02x", $0) }.joined()
-            case TLV.TLVKind:
-                result.kind = Int(v.withUnsafeBytes { $0.load(as: UInt32.self).bigEndian })
+            case TLV.Kind:
+                result.kind = UInt32(v.withUnsafeBytes { $0.load(as: UInt32.self).bigEndian })
             default:
                 break
         }
@@ -272,17 +274,17 @@ public func decodeNAddr(_ string: String) throws -> EntityPointer? {
         }
 
         switch t {
-        case TLV.TLVDefault:
+        case TLV.Default:
             result.identifier = String(decoding: v, as: UTF8.self)
-        case TLV.TLVRelay:
+        case TLV.Relay:
             result.relays.append(String(decoding: v, as: UTF8.self))
-        case TLV.TLVAuthor:
+        case TLV.Author:
             if v.count < 32 {
                 throw ShareableIndentifierError.publicKeyInvalid
             }
             result.publicKey = v.map { String(format: "%02x", $0) }.joined()
-        case TLV.TLVKind:
-            result.kind = Int(v.withUnsafeBytes { $0.load(as: UInt32.self).bigEndian })
+        case TLV.Kind:
+            result.kind = UInt32(v.withUnsafeBytes { $0.load(as: UInt32.self).bigEndian })
         default:
             break
         }
