@@ -84,11 +84,10 @@ public func encodeNote(withId id: String) throws -> String {
     return try id.bech32FromHex(hrp: notePrefix)
 }
 
-public func encodeNEvent(withId id: String, author: String, relays: [String] = []) throws -> String {
+public func encodeNEvent(withId id: String, author: String?, relays: [String] = [], kind: Int? = nil) throws -> String {
     guard let id = Data(hexString: id), id.count == 32 else { throw ShareableIndentifierError.invalidEventId }
-    guard let pubkey = Data(hexString: author), pubkey.count == 32 else { throw ShareableIndentifierError.publicKeyInvalid }
     var buffer = Data()
-    
+
     writeTLVEntry(buffer: &buffer, type: TLV.TLVDefault, value: [UInt8](id))
     
     for relay in relays {
@@ -96,8 +95,19 @@ public func encodeNEvent(withId id: String, author: String, relays: [String] = [
             writeTLVEntry(buffer: &buffer, type: TLV.TLVRelay, value: [UInt8](relayData))
         }
     }
+   
+    if let author {
+        guard let pubkey = Data(hexString: author), pubkey.count == 32 else { throw ShareableIndentifierError.publicKeyInvalid }
+        writeTLVEntry(buffer: &buffer, type: TLV.TLVAuthor, value: [UInt8](pubkey))
+    }
     
-    writeTLVEntry(buffer: &buffer, type: TLV.TLVAuthor, value: [UInt8](pubkey))
+    if let kind {
+        var kindBytes = [UInt8](repeating: 0, count: 4)
+        kindBytes.withUnsafeMutableBytes { (ptr: UnsafeMutableRawBufferPointer) in
+            ptr.storeBytes(of: UInt32(kind).bigEndian, as: UInt32.self)
+        }
+        writeTLVEntry(buffer: &buffer, type: TLV.TLVKind, value: kindBytes)
+    }
     
     return bech32Encode(hrp: nEventPrefix, buffer.bytes)
 }
