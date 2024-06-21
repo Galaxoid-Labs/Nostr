@@ -136,19 +136,87 @@ final class NostrTests: XCTestCase {
         }
     }
     
-    func testBech32EncodeEventId() async {
+    func testEncodeNote() async {
         let id = "f603166e0fdb6a0329e3998280ecad0e54d89f5f8bc20d1f259a41983aca9dfb"
-        if let encoded = Event.bech32EncodeEventId(id) {
+        if let encoded = try? encodeNote(withId: id) {
             XCTAssertEqual(encoded, "note17cp3vms0md4qx20rnxpgpm9dpe2d386l30pq68e9nfqeswk2nhasgvrk8y")
         } else {
             XCTAssert(false, "")
         }
     }
     
-    func testBech32DecodeEventId() async {
+    func testDecodeNote() async {
         let id = "note17cp3vms0md4qx20rnxpgpm9dpe2d386l30pq68e9nfqeswk2nhasgvrk8y"
-        if let decoded = Event.bech32DecodeEventId(id) {
+        if let decoded = try? decodeNote(id) {
             XCTAssertEqual(decoded, "f603166e0fdb6a0329e3998280ecad0e54d89f5f8bc20d1f259a41983aca9dfb")
+        } else {
+            XCTAssert(false, "")
+        }
+    }
+    
+    func testDecodeNProfile() async {
+        let profile = "nprofile1qqsrhuxx8l9ex335q7he0f09aej04zpazpl0ne2cgukyawd24mayt8gpp4mhxue69uhhytnc9e3k7mgpz4mhxue69uhkg6nzv9ejuumpv34kytnrdaksjlyr9p"
+        if let decoded = try? profile.decodeNProfile() {
+            XCTAssertEqual(decoded.publicKey, "3bf0c63fcb93463407af97a5e5ee64fa883d107ef9e558472c4eb9aaaefa459d")
+            XCTAssertEqual(decoded.relays, ["wss://r.x.com", "wss://djbas.sadkb.com"])
+        } else {
+            XCTAssert(false, "")
+        }
+    }
+    
+    func testDecodeNEvent() async {
+        let nevent = "nevent1qqsxxr5klnl7uxxhrxl0lgvsf8m27ft8dk00kcuzakfxeyvutd6ja0cprfmhxue69uhhyetvv9ujuam9wd6x2unwvf6xxtnrdaksyg8yvswsamt36tgvpa5v6dgg658umvv4ftquek3xnhdm0fuf0s3xzsa845wv"
+        if let decoded = try? nevent.decodeNEvent() {
+            print(decoded)
+            XCTAssertEqual(decoded.id, "630e96fcffee18d719beffa19049f6af25676d9efb6382ed926c919c5b752ebf")
+            XCTAssertEqual(decoded.author, "e4641d0eed71d2d0c0f68cd3508d50fcdb1954ac1ccda269ddbb7a7897c22614")
+            XCTAssertEqual(decoded.relays, ["wss://relay.westernbtc.com"])
+        } else {
+            XCTAssert(false, "")
+        }
+    }
+    
+    func testDecodeNAddr() async {
+        let naddr = "naddr1qqrxyctwv9hxzqfwwaehxw309aex2mrp0yhxummnw3ezuetcv9khqmr99ekhjer0d4skjm3wv4uxzmtsd3jjucm0d5q3vamnwvaz7tmwdaehgu3wvfskuctwvyhxxmmdqgsrhuxx8l9ex335q7he0f09aej04zpazpl0ne2cgukyawd24mayt8grqsqqqa28a3lkds"
+        if let decoded = try? naddr.decodeNAddr() {
+            print(decoded)
+            XCTAssertEqual(decoded.publicKey, "3bf0c63fcb93463407af97a5e5ee64fa883d107ef9e558472c4eb9aaaefa459d")
+            XCTAssertEqual(decoded.identifier, "banana")
+            XCTAssertEqual(decoded.kind, 30023)
+            XCTAssertEqual(decoded.relays, ["wss://relay.nostr.example.mydomain.example.com", "wss://nostr.banana.com"])
+        } else {
+            XCTAssert(false, "")
+        }
+    }
+    
+    func testEncodeNEvent() async {
+        let id = "45326f5d6962ab1e3cd424e758c3002b8665f7b0d8dcee9fe9e288d7751ac194"
+        let relays = ["wss://banana.com"]
+        let author = "7fa56f5d6962ab1e3cd424e758c3002b8665f7b0d8dcee9fe9e288d7751abb88"
+        if let encoded = try? encodeNEvent(withId: id, author: author, relays: relays) {
+            XCTAssertEqual(encoded, "nevent1qqsy2vn0t45k92c78n2zfe6ccvqzhpn977cd3h8wnl579zxhw5dvr9qpzpmhxue69uhkyctwv9hxztnrdaksygrl54h466tz4v0re4pyuavvxqptsejl0vxcmnhfl60z3rth2x4m3q04ndyp")
+        } else {
+            XCTAssert(false, "")
+        }
+    }
+    
+    func testEncodeNProfile() async {
+        let relays = ["wss://r.x.com", "wss://djbas.sadkb.com"]
+        let author = "3bf0c63fcb93463407af97a5e5ee64fa883d107ef9e558472c4eb9aaaefa459d"
+        if let encoded = try? encodeNProfile(publicKey: author, relays: relays) {
+            XCTAssertEqual(encoded, "nprofile1qqsrhuxx8l9ex335q7he0f09aej04zpazpl0ne2cgukyawd24mayt8gpp4mhxue69uhhytnc9e3k7mgpz4mhxue69uhkg6nzv9ejuumpv34kytnrdaksjlyr9p")
+        } else {
+            XCTAssert(false, "")
+        }
+    }
+    
+    func testEncodeNAddr() async {
+        let author = "3bf0c63fcb93463407af97a5e5ee64fa883d107ef9e558472c4eb9aaaefa459d"
+        let relays = ["wss://relay.nostr.example.mydomain.example.com", "wss://nostr.banana.com"]
+        let kind = 30023
+        let identifier = "banana"
+        if let encoded = try? encodeNAddr(publicKey: author, relays: relays, identifier: identifier, kind: kind) {
+            XCTAssertEqual(encoded, "naddr1qqrxyctwv9hxzqfwwaehxw309aex2mrp0yhxummnw3ezuetcv9khqmr99ekhjer0d4skjm3wv4uxzmtsd3jjucm0d5q3vamnwvaz7tmwdaehgu3wvfskuctwvyhxxmmdqgsrhuxx8l9ex335q7he0f09aej04zpazpl0ne2cgukyawd24mayt8grqsqqqa28a3lkds")
         } else {
             XCTAssert(false, "")
         }

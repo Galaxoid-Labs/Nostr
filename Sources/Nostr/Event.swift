@@ -71,17 +71,14 @@ extension Event {
         return ""
     }
     
-    public func bech32EncodeEventId() -> String? {
-        guard let id else { return nil }
-        return try? id.bech32FromHex(hrp: "note")
+    public func encodeNote() throws -> String {
+        guard let id else { throw ShareableIndentifierError.invalidEventId }
+        return try Nostr.encodeNote(withId: id)
     }
     
-    public static func bech32EncodeEventId(_ id: String) -> String? {
-        return try? id.bech32FromHex(hrp: "note")
-    }
-    
-    public static func bech32DecodeEventId(_ id: String) -> String? {
-        return try? id.hexFromBech32(hrp: "note")
+    public func encodeNEvent(relays: [String] = []) throws -> String {
+        guard let id = self.id else { throw ShareableIndentifierError.invalidEventId }
+        return try Nostr.encodeNEvent(withId: id, author: self.pubkey, relays: relays)
     }
 
     func serializableEventData() throws -> Data {

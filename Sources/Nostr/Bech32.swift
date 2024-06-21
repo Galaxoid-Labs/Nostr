@@ -45,7 +45,7 @@ public func bech32Polymod(_ values: Data) -> UInt32 {
 
 
 /// Expand a HRP for use in checksum computation.
-func bec32ExpandHRP(_ s: String) -> Data {
+func bech32ExpandHRP(_ s: String) -> Data {
     var left: [UInt8] = []
     var right: [UInt8] = []
     for x in Array(s) {
@@ -58,14 +58,14 @@ func bec32ExpandHRP(_ s: String) -> Data {
 
 /// Verify checksum
 public func bech32Verify(hrp: String, checksum: Data) -> Bool {
-    var data = bec32ExpandHRP(hrp)
+    var data = bech32ExpandHRP(hrp)
     data.append(checksum)
     return bech32Polymod(data) == 1
 }
 
 /// Create checksum
 public func bech32CreateChecksum(hrp: String, values: Data) -> Data {
-    var enc = bec32ExpandHRP(hrp)
+    var enc = bech32ExpandHRP(hrp)
     enc.append(values)
     enc.append(Data(repeating: 0x00, count: 6))
     let mod: UInt32 = bech32Polymod(enc) ^ 1
@@ -85,7 +85,7 @@ public func bech32Encode(hrp: String, _ input: [UInt8]) -> String {
 }
 
 func bech32Checksum(hrp: String, data: [UInt8]) -> [UInt8] {
-    let values = bec32ExpandHRP(hrp) + data
+    let values = bech32ExpandHRP(hrp) + data
     let polymod = bech32Polymod(values + [0,0,0,0,0,0]) ^ 1
     var result: [UInt32] = []
     for i in (0..<6) {
@@ -145,13 +145,17 @@ func eightToFiveBits(_ input: [UInt8]) -> [UInt8] {
 }
 
 /// Decode Bech32 string
-public func bech32Decode(_ str: String) throws -> (hrp: String, data: Data)? {
+public func bech32Decode(_ str: String, limit: Bool = true) throws -> (hrp: String, data: Data)? {
     guard let strBytes = str.data(using: .utf8) else {
         throw Bech32Error.nonUTF8String
     }
-    guard strBytes.count <= 90 else {
-        throw Bech32Error.stringLengthExceeded
+    
+    if limit {
+        guard strBytes.count <= 90 else {
+            throw Bech32Error.stringLengthExceeded
+        }
     }
+    
     var lower: Bool = false
     var upper: Bool = false
     for c in strBytes {

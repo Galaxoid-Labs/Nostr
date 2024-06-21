@@ -33,4 +33,16 @@ public extension String {
         }
     }
     
+    func decodeNProfile() throws -> ProfilePointer? {
+        return try Nostr.decodeNProfile(self)
+    }
+    
+    func decodeNEvent() throws -> EventPointer? {
+        return try Nostr.decodeNEvent(self)
+    }
+    
+    func decodeNAddr() throws -> EntityPointer? {
+        return try Nostr.decodeNAddr(self)
+    }
+    
 }
