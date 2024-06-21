@@ -9,7 +9,7 @@ Looking for something more high-level that also handles socket connections? Chec
 - Good test coverage
 
 # Dependencies
-- [secp256k1.swift v0.16.0](https://github.com/GigaBitcoin/secp256k1.swift)
+- [secp256k1.swift v0.17.0](https://github.com/GigaBitcoin/secp256k1.swift)
 
 # Platforms
 - ✅ MacOS 14+

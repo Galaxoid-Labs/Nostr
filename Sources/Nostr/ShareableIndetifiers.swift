@@ -35,7 +35,7 @@ public struct EventPointer: Codable {
     public var id: String
     public var relays: [String]
     public var author: String?
-    public var kind: UInt32?
+    public var kind: UInt32? // Should've been UInt16 like on event, but we have to move on...
     
     public enum CodingKeys: String, CodingKey {
         case id
@@ -48,7 +48,7 @@ public struct EventPointer: Codable {
 public struct EntityPointer: Codable {
     public var publicKey: String
     public var relays: [String]
-    public var kind: UInt32?
+    public var kind: UInt32? // Should've been UInt16 like on event, but we have to move on...
     public var identifier: String?
     
     public enum CodingKeys: String, CodingKey {
