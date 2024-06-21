@@ -25,7 +25,6 @@ Looking for something more high-level that also handles socket connections? Chec
 # Todo
 - Documentation
 - Finish test coverage
-- Setup CI
 
 # Getting Started
 More info to come soon
