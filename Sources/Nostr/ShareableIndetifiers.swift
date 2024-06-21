@@ -1,6 +1,8 @@
 //
 //  ShareableIdentifiers.swift
 //
+//  Adapted from https://github.com/nbd-wtf/go-nostr/tree/master/nip19
+//
 //
 //  Created by Jacob Davis on 6/21/24.
 //
