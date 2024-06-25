@@ -35,6 +35,14 @@ public struct Tag: Codable, Equatable {
         underlyingData = [id] + otherInformation.compactMap { $0 }
     }
     
+    public init(id: String, otherInformation: [String]?) {
+        if let otherInformation {
+            underlyingData = [id] + otherInformation.compactMap { $0 }
+        } else {
+            underlyingData = [id]
+        }
+    }
+
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         underlyingData = try container.decode([String].self)
