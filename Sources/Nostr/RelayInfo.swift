@@ -18,6 +18,7 @@ public struct RelayInfo: Codable {
     public let limitation: Limitation?
     public let paymentsUrl: String?
     public let fees: Fees?
+    public let icon: String?
     
     public enum CodingKeys: String, CodingKey {
         case description
@@ -29,6 +30,7 @@ public struct RelayInfo: Codable {
         case limitation
         case paymentsUrl = "payments_url"
         case fees
+        case icon
     }
 }
 
