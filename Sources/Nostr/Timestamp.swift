@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct Timestamp: Codable {
+public struct Timestamp: Codable, Equatable {
     
     public let timestamp: UInt64
     
