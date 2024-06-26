@@ -1,5 +1,5 @@
 //
-//  EventTag.swift
+//  Tag.swift
 //
 //
 //  Created by Jacob Davis on 3/25/24.

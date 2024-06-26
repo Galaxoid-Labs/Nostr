@@ -13,7 +13,7 @@ public struct Event: Codable {
     public var id: String? // 32-byte lowercase hex-encoded sha256 of the serialized event data
     public var pubkey: String // 32-byte lowercase hex-encoded public key of the event creator
     public var createdAt: Timestamp // Unix timestamp in seconds
-    public var kind: EventKind // Integer between 0 and 65535
+    public var kind: Kind // Integer between 0 and 65535
     public var tags: [Tag] // Array of arrays of strings for tags
     public var content: String // Arbitrary string content
     public var sig: String? // 64-byte lowercase hex of the signature
@@ -22,7 +22,7 @@ public struct Event: Codable {
         case id, pubkey, createdAt = "created_at", kind, tags, content, sig
     }
     
-    public init(id: String? = nil, pubkey: String, createdAt: Timestamp, kind: EventKind, tags: [Tag], content: String, sig: String? = nil) {
+    public init(id: String? = nil, pubkey: String, createdAt: Timestamp, kind: Kind, tags: [Tag], content: String, sig: String? = nil) {
         self.id = id
         self.pubkey = pubkey
         self.createdAt = createdAt
@@ -37,7 +37,7 @@ struct SerializableEvent: Encodable {
     let id = 0
     let publicKey: String
     let createdAt: Timestamp
-    let kind: EventKind
+    let kind: Kind
     let tags: [Tag]
     let content: String
     

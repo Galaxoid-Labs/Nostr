@@ -53,7 +53,7 @@ final class NostrTests: XCTestCase {
         
         var event = Event(id: nil, pubkey: keyPair.publicKey,
                           createdAt: Timestamp(timestamp: 1711384422),
-                          kind: EventKind(id: EventKind.textNote.id), tags: [], content: "Hello this is a new event", sig: nil)
+                          kind: Kind(id: Kind.textNote.id), tags: [], content: "Hello this is a new event", sig: nil)
         
         try event.sign(with: keyPair)
         XCTAssertEqual(event.id, "da036de740ac051db00ac323d4ced88722d005c41fe9d43a90abadc8df3b96e1")

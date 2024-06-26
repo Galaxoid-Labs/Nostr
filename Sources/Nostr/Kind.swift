@@ -1,5 +1,5 @@
 //
-//  EventKind.swift
+//  Kind.swift
 //
 //
 //  Created by Jacob Davis on 3/25/24.
@@ -8,7 +8,7 @@
 
 import Foundation
 
-public enum EventKind: Codable, Equatable {
+public enum Kind: Codable, Equatable {
     
     case setMetadata
     case textNote
