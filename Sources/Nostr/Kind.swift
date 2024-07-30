@@ -8,7 +8,7 @@
 
 import Foundation
 
-public enum Kind: Codable, Equatable {
+public enum Kind: Codable, Equatable, Sendable {
     
     case setMetadata
     case textNote
@@ -16,17 +16,17 @@ public enum Kind: Codable, Equatable {
     
     public init(id: UInt16) {
         switch id {
-        case 0: self = .setMetadata
-        case 1: self = .textNote
-        default: self = .custom(id)
+            case 0: self = .setMetadata
+            case 1: self = .textNote
+            default: self = .custom(id)
         }
     }
     
     public var id: UInt16 {
         switch self {
-        case .setMetadata: return 0
-        case .textNote: return 1
-        case .custom(let customId): return customId
+            case .setMetadata: return 0
+            case .textNote: return 1
+            case .custom(let customId): return customId
         }
     }
     

@@ -80,7 +80,7 @@ extension Event {
         guard let id = self.id else { throw ShareableIndentifierError.invalidEventId }
         return try Nostr.encodeNEvent(withId: id, author: self.pubkey, relays: relays)
     }
-
+    
     func serializableEventData() throws -> Data {
         let serializableEvent = SerializableEvent(
             publicKey: self.pubkey,
@@ -123,7 +123,7 @@ extension Event {
             return false
         }
     }
-
+    
     public mutating func sign(with keyPair: KeyPair) throws {
         do {
             let serializableEventData = try serializableEventData()

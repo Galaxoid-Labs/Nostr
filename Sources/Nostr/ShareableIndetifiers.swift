@@ -63,7 +63,7 @@ func readTLVEntry(data: [UInt8]) -> (type: UInt8, value: [UInt8]?) {
     guard data.count >= 2 else {
         return (0, nil)
     }
-
+    
     let type = data[0]
     let length = Int(data[1])
     
@@ -89,7 +89,7 @@ public func encodeNote(withId id: String) throws -> String {
 public func encodeNEvent(withId id: String, author: String?, relays: [String] = [], kind: UInt32? = nil) throws -> String {
     guard let id = Data(hexString: id), id.count == 32 else { throw ShareableIndentifierError.invalidEventId }
     var buffer = Data()
-
+    
     writeTLVEntry(buffer: &buffer, type: TLV.Default, value: [UInt8](id))
     
     for relay in relays {
@@ -97,7 +97,7 @@ public func encodeNEvent(withId id: String, author: String?, relays: [String] = 
             writeTLVEntry(buffer: &buffer, type: TLV.Relay, value: [UInt8](relayData))
         }
     }
-   
+    
     if let author {
         guard let pubkey = Data(hexString: author), pubkey.count == 32 else { throw ShareableIndentifierError.publicKeyInvalid }
         writeTLVEntry(buffer: &buffer, type: TLV.Author, value: [UInt8](pubkey))
@@ -272,23 +272,23 @@ public func decodeNAddr(_ string: String) throws -> EntityPointer? {
             }
             return result
         }
-
+        
         switch t {
-        case TLV.Default:
-            result.identifier = String(decoding: v, as: UTF8.self)
-        case TLV.Relay:
-            result.relays.append(String(decoding: v, as: UTF8.self))
-        case TLV.Author:
-            if v.count < 32 {
-                throw ShareableIndentifierError.publicKeyInvalid
-            }
-            result.publicKey = v.map { String(format: "%02x", $0) }.joined()
-        case TLV.Kind:
-            result.kind = UInt32(v.withUnsafeBytes { $0.load(as: UInt32.self).bigEndian })
-        default:
-            break
+            case TLV.Default:
+                result.identifier = String(decoding: v, as: UTF8.self)
+            case TLV.Relay:
+                result.relays.append(String(decoding: v, as: UTF8.self))
+            case TLV.Author:
+                if v.count < 32 {
+                    throw ShareableIndentifierError.publicKeyInvalid
+                }
+                result.publicKey = v.map { String(format: "%02x", $0) }.joined()
+            case TLV.Kind:
+                result.kind = UInt32(v.withUnsafeBytes { $0.load(as: UInt32.self).bigEndian })
+            default:
+                break
         }
-
+        
         curr += 2 + v.count
     }
     
@@ -305,7 +305,7 @@ public enum ShareableIndentifierError: LocalizedError {
     case publicKeyEmpty
     case publicKeyInvalid
     case invalidEventId
-
+    
     public var errorDescription: String? {
         switch self {
             case .wrongPrefix:

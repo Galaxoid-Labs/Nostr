@@ -129,7 +129,7 @@ public struct KeyPair {
             }
         }
     }
-   
+    
     // Should include npub1 with prefix
     fileprivate static func generateVanityBech32Key(leadingBech32Prefix: String) async throws -> KeyPair? {
         while true {
@@ -168,7 +168,7 @@ public struct KeyPair {
                     return try await generateLeadingZeroBitKey(withMinimumLeadingZeroBits: lzb)
                 }
             }
-
+            
             do {
                 for try await result in group {
                     if let keyPair = result {
@@ -189,7 +189,7 @@ public struct KeyPair {
         if leadingHexPrefix.isEmpty {
             throw KeyPairError.vanityHexPrefixInvalid
         }
-
+        
         for c in leadingHexPrefix {
             if !c.isHexDigit {
                 throw KeyPairError.vanityHexPrefixInvalid
@@ -204,7 +204,7 @@ public struct KeyPair {
                     return try await generateVanityHexKey(leadingHexPrefix: leadingHexPrefix)
                 }
             }
-
+            
             do {
                 for try await result in group {
                     if let keyPair = result {
@@ -225,7 +225,7 @@ public struct KeyPair {
         if trailingHexSuffix.isEmpty {
             throw KeyPairError.vanityHexSuffixInvalid
         }
-
+        
         for c in trailingHexSuffix {
             if !c.isHexDigit {
                 throw KeyPairError.vanityHexSuffixInvalid
@@ -240,7 +240,7 @@ public struct KeyPair {
                     return try await generateVanityHexKey(trailingHexSuffix: trailingHexSuffix)
                 }
             }
-
+            
             do {
                 for try await result in group {
                     if let keyPair = result {
@@ -276,7 +276,7 @@ public struct KeyPair {
                     return try await generateVanityBech32Key(leadingBech32Prefix: prefixWithNpub)
                 }
             }
-
+            
             do {
                 for try await result in group {
                     if let keyPair = result {
@@ -310,7 +310,7 @@ public struct KeyPair {
                     return try await generateVanityBech32Key(trailingBech32Suffix: trailingBech32Suffix)
                 }
             }
-
+            
             do {
                 for try await result in group {
                     if let keyPair = result {
@@ -349,5 +349,5 @@ public struct KeyPair {
         }
         print("\(hashsPerSecond) hashes per second, per core")
     }
-
+    
 }

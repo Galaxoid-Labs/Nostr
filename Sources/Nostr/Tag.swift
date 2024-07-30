@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct Tag: Codable, Equatable {
+public struct Tag: Codable, Equatable, Sendable {
     private let underlyingData: [String]
     
     public var id: String {
