@@ -45,8 +45,14 @@ public extension String {
         return try Nostr.decodeNAddr(self)
     }
     
-    func validPublicKeyLength() -> Bool {
-        return self.count == 64
+    var isValidPublicKey: Bool {
+        return self.count == 64 && self.isValidHexString
+    }
+    
+    var isValidHexString: Bool {
+        guard !self.isEmpty, self.count % 2 == 0 else { return false }
+        let hexCharacterSet = CharacterSet(charactersIn: "0123456789ABCDEFabcdef")
+        return self.unicodeScalars.allSatisfy { hexCharacterSet.contains($0) }
     }
     
 }
