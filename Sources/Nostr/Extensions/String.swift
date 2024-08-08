@@ -45,4 +45,8 @@ public extension String {
         return try Nostr.decodeNAddr(self)
     }
     
+    func validPublicKeyLength() -> Bool {
+        return self.count == 64
+    }
+    
 }
