@@ -11,7 +11,7 @@ let package = Package(
             targets: ["Nostr"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/GigaBitcoin/secp256k1.swift.git", from: "0.16.0")
+        .package(url: "https://github.com/GigaBitcoin/secp256k1.swift.git", exact: "0.17.0")
     ],
     targets: [
         .target(
