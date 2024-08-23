@@ -11,12 +11,12 @@ let package = Package(
             targets: ["Nostr"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/GigaBitcoin/secp256k1.swift.git", exact: "0.17.0")
+        .package(url: "https://github.com/21-DOT-DEV/swift-secp256k1.git", exact: "0.17.0")
     ],
     targets: [
         .target(
             name: "Nostr", dependencies: [
-                .product(name: "secp256k1", package: "secp256k1.swift")
+                .product(name: "secp256k1", package: "swift-secp256k1")
             ]),
         .testTarget(
             name: "NostrTests",
