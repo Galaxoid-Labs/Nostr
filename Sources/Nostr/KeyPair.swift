@@ -357,7 +357,7 @@ public struct KeyPair {
 import Glibc
 
 public func getProcessorCount() -> Int {
-    let count = sysconf(_SC_NPROCESSORS_ONLN)
+    let count = sysconf(Int32(_SC_NPROCESSORS_ONLN))
     return count > 0 ? Int(count) : 0
 }
 #else
