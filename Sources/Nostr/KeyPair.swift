@@ -356,12 +356,12 @@ public struct KeyPair {
 #if os(Linux)
 import Glibc
 
-func getProcessorCount() -> Int {
+public func getProcessorCount() -> Int {
     return sysconf(_SC_NPROCESSORS_ONLN)
 }
 #else
 
-func getProcessorCount() -> Int {
+public func getProcessorCount() -> Int {
     return ProcessInfo().processorCount
 }
 #endif
