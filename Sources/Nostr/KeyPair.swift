@@ -161,7 +161,7 @@ public struct KeyPair {
     
     public static func newLeadingZeroBitKey(withMinimumLeadingZeroBits lzb: Int = 8) async throws -> KeyPair? {
         return try await withThrowingTaskGroup(of: KeyPair?.self, body: { group in
-            let cores = ProcessInfo().processorCount
+            let cores = getProcessorCount()
             print("Using \(cores) cores")
             for _ in 0..<cores {
                 group.addTask {
@@ -197,7 +197,7 @@ public struct KeyPair {
         }
         
         return try await withThrowingTaskGroup(of: KeyPair?.self, body: { group in
-            let cores = ProcessInfo().processorCount
+            let cores = getProcessorCount()
             print("Using \(cores) cores")
             for _ in 0..<cores {
                 group.addTask {
@@ -233,7 +233,7 @@ public struct KeyPair {
         }
         
         return try await withThrowingTaskGroup(of: KeyPair?.self, body: { group in
-            let cores = ProcessInfo().processorCount
+            let cores = getProcessorCount()
             print("Using \(cores) cores")
             for _ in 0..<cores {
                 group.addTask {
@@ -269,7 +269,7 @@ public struct KeyPair {
         let prefixWithNpub = "npub1"+leadingBech32Prefix
         
         return try await withThrowingTaskGroup(of: KeyPair?.self, body: { group in
-            let cores = ProcessInfo().processorCount
+            let cores = getProcessorCount()
             print("Using \(cores) cores")
             for _ in 0..<cores {
                 group.addTask {
@@ -303,7 +303,7 @@ public struct KeyPair {
         }
         
         return try await withThrowingTaskGroup(of: KeyPair?.self, body: { group in
-            let cores = ProcessInfo().processorCount
+            let cores = getProcessorCount()
             print("Using \(cores) cores")
             for _ in 0..<cores {
                 group.addTask {
@@ -350,4 +350,18 @@ public struct KeyPair {
         print("\(hashsPerSecond) hashes per second, per core")
     }
     
+    
 }
+
+#if os(Linux)
+import Glibc
+
+func getProcessorCount() -> Int {
+    return sysconf(_SC_NPROCESSORS_ONLN)
+}
+#else
+
+func getProcessorCount() -> Int {
+    return ProcessInfo().processorCount
+}
+#endif
