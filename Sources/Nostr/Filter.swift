@@ -52,6 +52,27 @@ public struct Filter: Codable, Equatable {
         }
     }
     
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CustomCodingKeys.self)
+        
+        ids = try container.decodeIfPresent([String].self, forKey: CustomCodingKeys(stringValue: "ids"))
+        authors = try container.decodeIfPresent([String].self, forKey: CustomCodingKeys(stringValue: "authors"))
+        kinds = try container.decodeIfPresent([Kind].self, forKey: CustomCodingKeys(stringValue: "kinds"))
+        since = try container.decodeIfPresent(Timestamp.self, forKey: CustomCodingKeys(stringValue: "since"))
+        until = try container.decodeIfPresent(Timestamp.self, forKey: CustomCodingKeys(stringValue: "until"))
+        limit = try container.decodeIfPresent(Int.self, forKey: CustomCodingKeys(stringValue: "limit"))
+        
+        var decodedTags: [Tag] = []
+        for key in container.allKeys {
+            if key.stringValue.hasPrefix("#") {
+                let tagName = String(key.stringValue.dropFirst())
+                let tagValues = try container.decode([String].self, forKey: key)
+                decodedTags.append(Tag(id: tagName, otherInformation: tagValues))
+            }
+        }
+        tags = decodedTags
+    }
+    
     private struct CustomCodingKeys: CodingKey {
         var stringValue: String
         var intValue: Int? { return nil }

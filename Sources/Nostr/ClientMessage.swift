@@ -15,6 +15,31 @@ public enum ClientMessage: Codable {
     case unsubscribe(String)
     
     static var encoder = JSONEncoder()
+    static var decoder = JSONDecoder()
+    
+    public init(from decoder: Decoder) throws {
+        var container = try decoder.unkeyedContainer()
+        let messageType = try container.decode(String.self)
+        
+        switch messageType {
+        case "EVENT":
+            let event = try container.decode(Event.self)
+            self = .event(event)
+        case "REQ":
+            let subscriptionId = try container.decode(String.self)
+            var filters: [Filter] = []
+            while !container.isAtEnd {
+                let filter = try container.decode(Filter.self)
+                filters.append(filter)
+            }
+            self = .subscribe(Subscription(filters: filters, id: subscriptionId))
+        case "CLOSE":
+            let subscriptionId = try container.decode(String.self)
+            self = .unsubscribe(subscriptionId)
+        default:
+            throw DecodingError.dataCorruptedError(in: container, debugDescription: "Unknown message type: \(messageType)")
+        }
+    }
     
     public func encode(to encoder: Encoder) throws {
         
@@ -44,7 +69,15 @@ public enum ClientMessage: Codable {
         }
     }
     
+    public static func from(string: String) throws -> ClientMessage {
+        guard let data = string.data(using: .utf8) else {
+            throw ClientMessageError.stringDecodeFailed
+        }
+        return try decoder.decode(ClientMessage.self, from: data)
+    }
+    
     public enum ClientMessageError: Error {
         case stringEncodeFailed
+        case stringDecodeFailed
     }
 }

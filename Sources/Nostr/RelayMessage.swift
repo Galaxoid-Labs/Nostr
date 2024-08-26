@@ -19,6 +19,7 @@ public enum RelayMessage: Codable {
     case other([String])
     
     static var decoder = JSONDecoder()
+    static var dencoder = JSONEncoder()
     
     public init(from decoder: Decoder) throws {
         
@@ -49,6 +50,37 @@ public enum RelayMessage: Codable {
                 let remainingItemsCount = (container.count ?? 1) - 1
                 let remainingItems = try (0..<remainingItemsCount).map { _ in try container.decode(String.self) }
                 self = .other([messageType] + remainingItems)
+        }
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.unkeyedContainer()
+        
+        switch self {
+        case .event(let subscriptionId, let event):
+            try container.encode("EVENT")
+            try container.encode(subscriptionId)
+            try container.encode(event)
+        case .ok(let subscriptionId, let acceptance, let message):
+            try container.encode("OK")
+            try container.encode(subscriptionId)
+            try container.encode(acceptance)
+            try container.encode(message)
+        case .eose(let subscriptionId):
+            try container.encode("EOSE")
+            try container.encode(subscriptionId)
+        case .closed(let subscriptionId, let message):
+            try container.encode("CLOSED")
+            try container.encode(subscriptionId)
+            try container.encode(message)
+        case .notice(let message):
+            try container.encode("NOTICE")
+            try container.encode(message)
+        case .auth(let challenge):
+            try container.encode("AUTH")
+            try container.encode(challenge)
+        case .other(let items):
+            try items.forEach { try container.encode($0) }
         }
     }
     
