@@ -19,7 +19,7 @@ public enum RelayMessage: Codable {
     case other([String])
     
     static var decoder = JSONDecoder()
-    static var dencoder = JSONEncoder()
+    static var encoder = JSONEncoder()
     
     public init(from decoder: Decoder) throws {
         
@@ -84,6 +84,16 @@ public enum RelayMessage: Codable {
         }
     }
     
+    public func string() throws -> String {
+        do {
+            let data = try RelayMessage.encoder.encode(self)
+            guard let result = String(data: data, encoding: .utf8) else { throw RelayMessageError.stringEncodeFailed }
+            return result
+        } catch {
+            throw error
+        }
+    }
+    
     public init(text: String) throws {
         guard let data = text.data(using: .utf8) else { throw RelayMessageError.dataEncodeFailed }
         self = try RelayMessage.decoder.decode(RelayMessage.self, from: data)
@@ -91,5 +101,6 @@ public enum RelayMessage: Codable {
     
     public enum RelayMessageError: Error {
         case dataEncodeFailed
+        case stringEncodeFailed
     }
 }
