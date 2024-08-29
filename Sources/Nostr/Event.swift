@@ -71,6 +71,16 @@ extension Event {
         return ""
     }
     
+    public func string() -> String? {
+        let encoder = JSONEncoder()
+        if let data = try? encoder.encode(self) {
+            if let jsonString = String(data: data, encoding: .utf8) {
+                return jsonString
+            }
+        }
+        return nil
+    }
+    
     public func encodeNote() throws -> String {
         guard let id else { throw ShareableIndentifierError.invalidEventId }
         return try Nostr.encodeNote(withId: id)
