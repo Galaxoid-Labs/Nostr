@@ -8,7 +8,7 @@
 import Foundation
 import secp256k1
 
-public struct Event: Codable {
+public struct Event: Codable, Sendable {
     
     public var id: String? // 32-byte lowercase hex-encoded sha256 of the serialized event data
     public var pubkey: String // 32-byte lowercase hex-encoded public key of the event creator

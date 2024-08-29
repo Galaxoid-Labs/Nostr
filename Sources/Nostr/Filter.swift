@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct Filter: Codable, Equatable {
+public struct Filter: Codable, Equatable, Sendable {
     
     public let ids: [String]?
     public let authors: [String]?

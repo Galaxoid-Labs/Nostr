@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct Subscription: Codable, Equatable {
+public struct Subscription: Codable, Equatable, Sendable {
     
     public let id: String
     public let filters: [Filter]

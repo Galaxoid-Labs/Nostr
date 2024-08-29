@@ -8,7 +8,7 @@
 
 import Foundation
 
-public enum RelayMessage: Codable {
+public enum RelayMessage: Codable, Sendable {
     
     case event(String, Event)
     case ok(String, Bool, String)
