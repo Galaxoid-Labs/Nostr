@@ -1,6 +1,6 @@
 import XCTest
 import Nostr
-import secp256k1
+import P256K
 
 final class NostrTests: XCTestCase {
     

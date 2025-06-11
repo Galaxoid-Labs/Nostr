@@ -6,7 +6,8 @@
 //
 
 import Foundation
-import secp256k1
+import P256K
+import libsecp256k1
 
 public struct Event: Codable, Sendable {
     
@@ -124,7 +125,7 @@ extension Event {
             guard let sigBytes = Data(hexString: sig)?.bytes else { return false }
             guard let pubkeyBytes = Data(hexString: self.pubkey)?.bytes else { return false }
             
-            let ctx = try secp256k1.Context.create()
+            let ctx = try P256K.Context.create()
             var xOnlyPubkey = secp256k1_xonly_pubkey.init()
             let xOnlyPubkeyValid = secp256k1_xonly_pubkey_parse(ctx, &xOnlyPubkey, pubkeyBytes) != 0
             if !xOnlyPubkeyValid { return false }

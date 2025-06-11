@@ -6,12 +6,12 @@
 //
 
 import Foundation
-import secp256k1
+import P256K
 
 public struct KeyPair {
     
-    typealias PrivateKey = secp256k1.Schnorr.PrivateKey
-    typealias PublicKey = secp256k1.Schnorr.XonlyKey
+    typealias PrivateKey = P256K.Schnorr.PrivateKey
+    typealias PublicKey = P256K.Schnorr.XonlyKey
     
     private let _privateKey: PrivateKey
     
