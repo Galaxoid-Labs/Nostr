@@ -1,7 +1,7 @@
 # Nostr
 Nostr is a lightweight Swift package for handling Nostr types on the client side.
 
-Looking for something more high-level that also handles socket connections? Checkout out [NostrClient](https://github.com/Galaxoid-Labs/NostrClient.swift)
+Looking for something more high-level that also handles socket connections? Checkout out [NostrClient](https://github.com/Galaxoid-Labs/NostrClient)
 
 # Goals
 - Minimal dependencies with support for as many platforms as possible.
